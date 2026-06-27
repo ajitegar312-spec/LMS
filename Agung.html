@@ -269,21 +269,9 @@
 
   <main>
     <section id="panel-1" class="tab-content active" role="tabpanel" aria-labelledby="tab-1">
-      <article class="card" id="card-1">
-        <h3>Dasar-dasar HTML Semantik</h3>
-        <p>HTML Semantik mempermudah mesin pencari dan teknologi asistif (screen reader) membaca struktur web Anda secara teratur dan mudah dipahami.</p>
-        <div class="card-actions">
-          <button class="btn-delete" onclick="deleteCard('card-1')">Hapus Artikel</button>
-        </div>
-      </article>
-
-      <article class="card" id="card-2">
-        <h3>Panduan CSS Grid vs Flexbox</h3>
-        <p>Gunakan Flexbox untuk tata letak satu dimensi (baris atau kolom saja) dan beralihlah ke CSS Grid untuk tata letak kompleks dua dimensi.</p>
-        <div class="card-actions">
-          <button class="btn-delete" onclick="deleteCard('card-2')">Hapus Artikel</button>
-        </div>
-      </article>
+      <div id="artikel-container">
+        <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Memuat artikel...</p>
+      </div>
     </section>
 
     <section id="panel-2" class="tab-content" role="tabpanel" aria-labelledby="tab-2">
@@ -320,6 +308,7 @@
     const tabContents = document.querySelectorAll('.tab-content');
     const undoBar = document.getElementById('undoBar');
     const undoBtn = document.getElementById('undoBtn');
+    const artikelContainer = document.getElementById('artikel-container');
 
     let deletedCardId = null;
 
@@ -341,7 +330,7 @@
     // 3. Refresh Action
     refreshBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      location.reload();
+      ambilDataArtikel(); // Memanggil fungsi fetch dibanding refresh full halaman
     });
 
     // 4. Tabs Interaction
@@ -355,7 +344,6 @@
 
         tab.classList.add('active');
         tab.setAttribute('aria-selected', 'true');
-        tabContents[index].add('active');
         tabContents[index].classList.add('active');
       });
     });
@@ -385,6 +373,59 @@
         undoBar.classList.remove('active');
       }
     });
+
+    // 6. Fungsi Ambil Data dari Cloudflare D1 & Tampilkan ke UI Website
+    async function ambilDataArtikel() {
+      // Masukkan token JWT dari jwt.io Anda di sini
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.QMUFsIDTnFmyG3nMiGM6SDlOWk5GTlVSR0Yzd2g3U21xSnAtUXYzMA"; 
+      
+      try {
+        const response = await fetch('https://lms.agungbarliansaputra.workers.dev/api/articles', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const articles = result.data;
+          artikelContainer.innerHTML = ''; // Bersihkan loader "Memuat artikel..."
+
+          if (articles.length === 0) {
+            artikelContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Belum ada artikel di database D1.</p>';
+            return;
+          }
+
+          // Looping data artikel dari database Cloudflare untuk dirender ke HTML
+          articles.forEach((item) => {
+            const cardId = `card-${item.id || Math.random().toString(36).substr(2, 9)}`;
+            const cardHtml = `
+              <article class="card" id="${cardId}">
+                <h3>${item.title}</h3>
+                <p>${item.content}</p>
+                <div class="card-actions">
+                  <button class="btn-delete" onclick="deleteCard('${cardId}')">Hapus Artikel</button>
+                </div>
+              </article>
+            `;
+            artikelContainer.insertAdjacentHTML('beforeend', cardHtml);
+          });
+
+          console.log("Data D1 Berhasil Dirender:", articles);
+        } else {
+          artikelContainer.innerHTML = `<p style="text-align: center; color: var(--danger); margin-top: 20px;">Error: ${result.error}</p>`;
+        }
+      } catch (error) {
+        console.error("Terjadi kesalahan jaringan:", error);
+        artikelContainer.innerHTML = '<p style="text-align: center; color: var(--danger); margin-top: 20px;">Gagal terhubung ke API Server.</p>';
+      }
+    }
+
+    // Jalankan otomatis fungsi ambil data saat halaman pertama kali dibuka
+    document.addEventListener('DOMContentLoaded', ambilDataArtikel);
   </script>
 </body>
 </html>
