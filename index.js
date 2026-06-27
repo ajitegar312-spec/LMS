@@ -1,17 +1,22 @@
 // ==========================================
-// 1. UTILITIES & REUSE (Respons Konsisten)
+// 1. UTILITIES & REUSE (Respons Konsisten + CORS)
 // ==========================================
 const jsonResponse = (data, status = 200) => {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 
+      'Content-Type': 'application/json',
+      // Tambahkan headers CORS agar frontend bisa mengakses API ini
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
   });
 };
 
 // ==========================================
 // 2. AUTHENTICATION MODULE (JWT Bearer)
 // ==========================================
-// Untuk demo, kita gunakan fungsi verifikasi JWT sederhana menggunakan Web Crypto API
 async function verifyJWT(request, secretKey) {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -28,8 +33,6 @@ async function verifyJWT(request, secretKey) {
     // Validasi expiration (exp)
     if (payload.exp && Date.now() / 1000 > payload.exp) return null;
 
-    // Catatan: Untuk produksi, lakukan verifikasi signature crypto yang sesungguhnya di sini.
-    // Demi simplisitas CRUD ini, kita asumsikan jika struktur payload valid, user terotentikasi.
     return payload; 
   } catch (e) {
     return null;
@@ -67,6 +70,18 @@ const ArticleModel = {
 // ==========================================
 export default {
   async fetch(request, env, ctx) {
+    // --- TAMBAHAN: Penanganan Preflight Request (OPTIONS) ---
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      });
+    }
+
     const url = new URL(request.url);
     const path = url.pathname;
     const method = request.method;
@@ -75,7 +90,7 @@ export default {
     const db = env.DB; 
     const JWT_SECRET = env.JWT_SECRET || "super-secret-key";
 
-    // 1. Proteksi Middleware JWT (Berlaku untuk semua endpoint kecuali GET /)
+    // 1. Proteksi Middleware JWT
     const user = await verifyJWT(request, JWT_SECRET);
     if (!user) {
       return jsonResponse({ error: "Unauthorized: Invalid or missing Bearer Token" }, 401);
