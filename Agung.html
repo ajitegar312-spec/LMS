@@ -3,429 +3,230 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LMS Dashboard UI</title>
+  <title>LMS Dashboard v2.0 - Premium Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Konfigurasi warna kustom tema profesional
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#0f172a',      /* Slate 900 */
+              card: '#1e293b',      /* Slate 800 */
+              accent: '#38bdf8',    /* Sky 400 (Neon blue vibe) */
+              success: '#4ade80'    /* Green 400 */
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* --- CSS VARIABLES & RESET --- */
-    :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --bg-main: #f8fafc;
-      --bg-card: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --danger: #ef4444;
-      --transition: all 0.3s ease;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      padding-top: 60px; /* Space for Top App Bar */
-      padding-bottom: 70px; /* Space for Bottom Menu */
-      min-height: 100vh;
-    }
-
-    /* --- TOP APP BAR & SUBMENU --- */
-    .top-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: var(--bg-card);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      z-index: 100;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-    }
-    .icon-btn:hover { background-color: #f1f5f9; }
-
-    .top-menu-right { position: relative; }
-    
-    /* Submenu Dropdown */
-    .submenu {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      background: var(--bg-card);
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      width: 160px;
-      display: none;
-      flex-direction: column;
-    }
-    .submenu.active { display: flex; }
-    .submenu a {
-      padding: 12px 16px;
-      text-decoration: none;
-      color: var(--text-main);
-      font-size: 0.95rem;
-    }
-    .submenu a:hover { background-color: #f1f5f9; }
-
-    /* --- BURGER MENU (DRAWER) --- */
-    .drawer-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4);
-      opacity: 0; pointer-events: none;
-      transition: var(--transition);
-      z-index: 200;
-    }
-    .drawer-overlay.active { opacity: 1; pointer-events: auto; }
-
-    .drawer {
-      position: fixed;
-      top: 0; left: -280px; bottom: 0;
-      width: 280px;
-      background: var(--bg-card);
-      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-      transition: var(--transition);
-      z-index: 201;
-      padding: 24px 16px;
-    }
-    .drawer.active { left: 0; }
-    .drawer h2 { margin-bottom: 24px; font-size: 1.3rem; }
-    .drawer nav a {
-      display: block;
-      padding: 12px;
-      color: var(--text-main);
-      text-decoration: none;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
-    .drawer nav a:hover { background: #f1f5f9; }
-
-    /* --- TABS BAR --- */
-    .tabs-container {
-      background: var(--bg-card);
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: center;
-    }
-    .tab-btn {
-      background: none;
-      border: none;
-      padding: 16px 24px;
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: var(--transition);
-    }
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    /* --- MAIN CONTENT & CARDS --- */
-    main {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Card & Animasi Mouseover */
-    .card {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #e2e8f0;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      position: relative;
-    }
-    .card:hover {
-      transform: translateY(-4px); /* Animasi Moveover */
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-    .card h3 { margin-bottom: 8px; font-size: 1.2rem; }
-    .card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
-    
-    .card-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 16px;
-    }
-    .btn-delete {
-      background: none;
-      border: none;
-      color: var(--danger);
-      cursor: pointer;
-      font-weight: 500;
-      padding: 4px 8px;
-    }
-
-    /* --- UNDO TOAST BAR (Bukan Notifikasi Gangguan) --- */
-    .undo-bar {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1e293b;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: var(--transition);
-      z-index: 99;
-    }
-    .undo-bar.active { transform: translateX(-50%) translateY(0); }
-    .btn-undo {
-      background: var(--primary);
-      border: none;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* --- BOTTOM MENU --- */
-    .bottom-menu {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 64px;
-      background: var(--bg-card);
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-    }
-    .bottom-item {
-      background: none;
-      border: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.8rem;
-      gap: 4px;
-    }
-    .bottom-item.active { color: var(--primary); }
-    .bottom-item span { font-size: 1.2rem; }
+    body { font-family: 'Inter', sans-serif; }
+    /* Efek scrollbar halus */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
   </style>
 </head>
-<body>
+<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col justify-between">
 
-  <header class="top-bar">
-    <button class="icon-btn" id="burgerBtn" aria-label="Buka Menu Navigasi">&#9776;</button>
-    <h1>LMS Artikel</h1>
-    <div class="top-menu-right">
-      <button class="icon-btn" id="submenuBtn" aria-label="Menu Opsi Tambahan">&#8942;</button>
-      <div class="submenu" id="submenu">
-        <a href="#" id="refreshBtn">🔄 Refresh Halaman</a>
-        <a href="#">⚙️ Pengaturan</a>
+  <header class="border-b border-slate-800 bg-brand-card/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-tr from-sky-500 to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-sky-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+        </div>
+        <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">EduSpace <span class="text-brand-accent font-medium text-sm px-2 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/20 ml-1">LMS</span></h1>
+      </div>
+      <div class="flex items-center gap-2 text-sm text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+        <span class="w-2 h-2 rounded-full bg-brand-success animate-pulse"></span>
+        <span>Cloudflare DB Connected</span>
       </div>
     </div>
   </header>
 
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <aside class="drawer" id="drawer" role="navigation" aria-label="Main Navigation">
-    <h2>Menu Utama</h2>
-    <nav>
-      <a href="#">📖 Kelas Saya</a>
-      <a href="#">📝 Tugas</a>
-      <a href="#">📊 Nilai</a>
-    </nav>
-  </aside>
-
-  <div class="tabs-container" role="tablist" aria-label="Kategori Artikel">
-    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1">Artikel Terbaru</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2">Disimpan</button>
-  </div>
-
-  <main>
-    <section id="panel-1" class="tab-content active" role="tabpanel" aria-labelledby="tab-1">
-      <div id="artikel-container">
-        <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Memuat artikel...</p>
+  <main class="max-w-5xl mx-auto w-full p-6 flex-grow grid grid-cols-1 md:grid-cols-3 gap-8">
+    
+    <section class="md:col-span-1">
+      <div class="bg-brand-card border border-slate-800 rounded-2xl p-6 sticky top-24 shadow-xl">
+        <h2 class="text-lg font-semibold text-white mb-1">Buat Artikel Baru</h2>
+        <p class="text-xs text-slate-400 mb-5">Publikasikan materi atau catatan LMS Anda secara langsung ke database.</p>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Judul Artikel</label>
+            <input type="text" id="input-title" placeholder="Contoh: Belajar Cloudflare D1" 
+                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Isi / Konten</label>
+            <textarea id="input-content" rows="5" placeholder="Tulis pembahasan lengkap materi Anda di sini..." 
+                      class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors resize-none"></textarea>
+          </div>
+          <button onclick="simpanArtikelBaru()" 
+                  class="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white font-medium text-sm py-3 px-4 rounded-xl hover:from-sky-400 hover:to-blue-500 active:scale-[0.98] transition-all shadow-lg shadow-sky-500/10">
+            🚀 Publikasikan Artikel
+          </button>
+        </div>
       </div>
     </section>
 
-    <section id="panel-2" class="tab-content" role="tabpanel" aria-labelledby="tab-2">
-      <p style="text-align: center; color: var(--text-muted); margin-top: 40px;">Belum ada artikel yang disimpan.</p>
+    <section class="md:col-span-2 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+          Materi Terbaru 
+          <span id="article-count" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md">0</span>
+        </h2>
+        <button onclick="ambilDataArtikel()" class="text-xs text-brand-accent hover:underline flex items-center gap-1">
+          🔄 Segarkan Data
+        </button>
+      </div>
+
+      <div id="articles-container" class="space-y-4">
+        <div id="loading-state" class="text-center py-12 bg-brand-card/30 border border-dashed border-slate-800 rounded-2xl">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-brand-accent border-r-2 mb-3"></div>
+          <p class="text-sm text-slate-400">Menghubungkan ke Cloudflare D1 & memuat materi...</p>
+        </div>
+      </div>
     </section>
+
   </main>
 
-  <div class="undo-bar" id="undoBar" aria-live="polite">
-    <span>Artikel berhasil dihapus.</span>
-    <button class="btn-undo" id="undoBtn">Urungkan (Undo)</button>
-  </div>
-
-  <nav class="bottom-menu" aria-label="Navigasi Bawah">
-    <button class="bottom-item active" aria-label="Beranda">
-      <span>🏠</span>Beranda
-    </button>
-    <button class="bottom-item" aria-label="Cari">
-      <span>🔍</span>Cari
-    </button>
-    <button class="bottom-item" aria-label="Profil">
-      <span>👤</span>Profil
-    </button>
-  </nav>
+  <footer class="border-t border-slate-800 bg-brand-card/30 py-4 px-6 text-center text-xs text-slate-500">
+    <p>&copy; 2026 EduSpace LMS. Powered by Cloudflare D1 & Workers.</p>
+  </footer>
 
   <script>
-    // Elements
-    const burgerBtn = document.getElementById('burgerBtn');
-    const drawer = document.getElementById('drawer');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    const submenuBtn = document.getElementById('submenuBtn');
-    const submenu = document.getElementById('submenu');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const tabs = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const undoBar = document.getElementById('undoBar');
-    const undoBtn = document.getElementById('undoBtn');
-    const artikelContainer = document.getElementById('artikel-container');
+    // Konfigurasi API
+    const API_URL = 'https://lms.agungbarliansaputra.workers.dev/api/articles';
+    // Gunakan Token JWT yang sudah valid
+    const JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.QMUFsIDTnFmyG3nMiGM6SDlOWk5GTlVSR0Yzd2g3U21xSnAtUXYzMA";
 
-    let deletedCardId = null;
-
-    // 1. Toggle Drawer (Burger Menu)
-    function toggleDrawer() {
-      drawer.classList.toggle('active');
-      drawerOverlay.classList.toggle('active');
-    }
-    burgerBtn.addEventListener('click', toggleDrawer);
-    drawerOverlay.addEventListener('click', toggleDrawer);
-
-    // 2. Toggle Top App Submenu
-    submenuBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      submenu.classList.toggle('active');
-    });
-    document.addEventListener('click', () => submenu.classList.remove('active'));
-
-    // 3. Refresh Action
-    refreshBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      ambilDataArtikel(); // Memanggil fungsi fetch dibanding refresh full halaman
-    });
-
-    // 4. Tabs Interaction
-    tabs.forEach((tab, index) => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tabContents.forEach(c => c.classList.remove('active'));
-
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-        tabContents[index].classList.add('active');
-      });
-    });
-
-    // 5. Delete & Non-Disruptive Undo Action
-    function deleteCard(cardId) {
-      const card = document.getElementById(cardId);
-      card.style.display = 'none';
-      deletedCardId = cardId;
-      
-      // Tampilkan bar undo pelan-pelan
-      undoBar.classList.add('active');
-
-      // Auto sembunyikan bar undo setelah 5 detik jika tidak di-klik
-      setTimeout(() => {
-        if(deletedCardId === cardId) {
-          undoBar.classList.remove('active');
-        }
-      }, 5000);
-    }
-
-    undoBtn.addEventListener('click', () => {
-      if (deletedCardId) {
-        const card = document.getElementById(deletedCardId);
-        card.style.display = 'block';
-        deletedCardId = null;
-        undoBar.classList.remove('active');
-      }
-    });
-
-    // 6. Fungsi Ambil Data dari Cloudflare D1 & Tampilkan ke UI Website
+    // 1. Ambil Data dari Database (GET)
     async function ambilDataArtikel() {
-      // Masukkan token JWT dari jwt.io Anda di sini
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.QMUFsIDTnFmyG3nMiGM6SDlOWk5GTlVSR0Yzd2g3U21xSnAtUXYzMA"; 
+      const container = document.getElementById('articles-container');
+      const countBadge = document.getElementById('article-count');
       
       try {
-        const response = await fetch('https://lms.agungbarliansaputra.workers.dev/api/articles', {
+        const response = await fetch(API_URL, {
           method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Authorization': `Bearer ${JWT_TOKEN}` }
         });
-
         const result = await response.json();
 
-        if (result.success) {
-          const articles = result.data;
-          artikelContainer.innerHTML = ''; // Bersihkan loader "Memuat artikel..."
+        if (result.success && result.data) {
+          container.innerHTML = '';
+          countBadge.innerText = result.data.length;
 
-          if (articles.length === 0) {
-            artikelContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Belum ada artikel di database D1.</p>';
+          if (result.data.length === 0) {
+            container.innerHTML = `
+              <div class="text-center py-12 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+                📭 Belum ada materi yang diterbitkan. Silakan tambah di panel sebelah kiri!
+              </div>`;
             return;
           }
 
-          // Looping data artikel dari database Cloudflare untuk dirender ke HTML
-          articles.forEach((item) => {
-            const cardId = `card-${item.id || Math.random().toString(36).substr(2, 9)}`;
-            const cardHtml = `
-              <article class="card" id="${cardId}">
-                <h3>${item.title}</h3>
-                <p>${item.content}</p>
-                <div class="card-actions">
-                  <button class="btn-delete" onclick="deleteCard('${cardId}')">Hapus Artikel</button>
+          result.data.forEach(article => {
+            const dateStr = article.created_at ? new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Baru saja';
+            
+            const card = document.createElement('div');
+            card.className = "bg-brand-card border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-all shadow-md flex flex-col justify-between gap-4";
+            card.innerHTML = `
+              <div>
+                <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span class="bg-slate-700/50 px-2 py-1 rounded text-slate-300 font-medium">📝 Oleh: ${article.author || 'Anonymous'}</span>
+                  <span>${dateStr}</span>
                 </div>
-              </article>
+                <h3 class="text-md font-semibold text-white mb-2">${article.title}</h3>
+                <p class="text-sm text-slate-400 leading-relaxed whitespace-pre-line">${article.content}</p>
+              </div>
+              <div class="flex justify-end border-t border-slate-800/60 pt-3">
+                <button onclick="hapusArtikel('${article.id}')" class="text-xs font-medium text-rose-400 hover:bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20 transition-all">
+                  🗑️ Hapus Artikel
+                </button>
+              </div>
             `;
-            artikelContainer.insertAdjacentHTML('beforeend', cardHtml);
+            container.appendChild(card);
           });
-
-          console.log("Data D1 Berhasil Dirender:", articles);
         } else {
-          artikelContainer.innerHTML = `<p style="text-align: center; color: var(--danger); margin-top: 20px;">Error: ${result.error}</p>`;
+          tampilkanError("Gagal memuat data dari API.");
         }
       } catch (error) {
-        console.error("Terjadi kesalahan jaringan:", error);
-        artikelContainer.innerHTML = '<p style="text-align: center; color: var(--danger); margin-top: 20px;">Gagal terhubung ke API Server.</p>';
+        console.error(error);
+        tampilkanError("Gagal terhubung ke API Server. Cek CORS atau koneksi internet.");
       }
     }
 
-    // Jalankan otomatis fungsi ambil data saat halaman pertama kali dibuka
-    document.addEventListener('DOMContentLoaded', ambilDataArtikel);
+    // 2. Tambah Artikel Baru ke Database (POST)
+    async function simpanArtikelBaru() {
+      const titleInput = document.getElementById('input-title');
+      const contentInput = document.getElementById('input-content');
+
+      if (!titleInput.value.trim() || !contentInput.value.trim()) {
+        alert("⚠️ Judul dan konten materi tidak boleh kosong!");
+        return;
+      }
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${JWT_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: titleInput.value.trim(),
+            content: contentInput.value.trim()
+          })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          titleInput.value = '';
+          contentInput.value = '';
+          ambilDataArtikel(); // Refresh otomatis agar artikel baru masuk list
+        } else {
+          alert("Gagal menyimpan: " + result.error);
+        }
+      } catch (error) {
+        alert("Gagal mengirim data ke server.");
+      }
+    }
+
+    // 3. SISTEM KEREN: Hapus Langsung dari Database D1 (DELETE)
+    async function hapusArtikel(id) {
+      if (!confirm("Apakah Anda yakin ingin menghapus materi ini dari database?")) return;
+
+      try {
+        const response = await fetch(`${API_URL}/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${JWT_TOKEN}` }
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          ambilDataArtikel(); // Refresh otomatis setelah dihapus
+        } else {
+          alert("Gagal menghapus: " + result.error);
+        }
+      } catch (error) {
+        alert("Terjadi kesalahan sistem saat mencoba menghapus.");
+      }
+    }
+
+    function tampilkanError(pesan) {
+      const container = document.getElementById('articles-container');
+      container.innerHTML = `
+        <div class="text-center py-8 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-2xl text-sm">
+          ❌ ${pesan}
+        </div>`;
+    }
+
+    // Jalankan otomatis saat halaman pertama kali dibuka browser
+    window.onload = ambilDataArtikel;
   </script>
 </body>
 </html>
