@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EduPulse - Modern Tech Journal</title>
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -14,24 +15,25 @@
           },
           colors: {
             surface: {
-              900: '#0b0f19', /* Deep space dark */
-              800: '#151b2c', /* Card dark */
-              700: '#222b44'  /* Border/Hover dark */
+              900: '#0b0f19', /* Deep space dark bg */
+              800: '#151b2c', /* Card bg */
+              700: '#222b44'  /* Border hover color */
             }
           }
         }
       }
     }
   </script>
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
   <style>
     .serif-title { font-family: 'Playfair Display', Georgia, serif; }
-    /* Smooth transition global */
-    * { transition: property 0.2s ease-in-out; }
+    * { transition: all 0.2s ease-in-out; }
   </style>
 </head>
 <body class="bg-surface-900 text-slate-200 min-h-screen flex flex-col justify-between selection:bg-sky-500/30">
 
+  <!-- ================= BRAND NAVIGATION ================= -->
   <nav class="border-b border-slate-800/80 bg-surface-900/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
     <div class="max-w-6xl mx-auto flex justify-between items-center">
       <a href="#" class="flex items-center gap-2.5 group">
@@ -49,6 +51,7 @@
     </div>
   </nav>
 
+  <!-- ================= HERO SECTION (Pembuka Portal Berita) ================= -->
   <header class="relative overflow-hidden border-b border-slate-800/50 bg-gradient-to-b from-blue-950/20 to-transparent py-16 px-6">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_45%)]"></div>
     <div class="max-w-4xl mx-auto text-center relative z-10">
@@ -62,8 +65,10 @@
     </div>
   </header>
 
+  <!-- ================= MAIN BLOG FEED ================= -->
   <main class="max-w-6xl mx-auto w-full px-6 py-12 flex-grow">
     
+    <!-- Bagian Header Konten / Filter -->
     <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-8">
       <div class="flex items-center gap-3">
         <h2 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Semua Publikasi</h2>
@@ -75,7 +80,9 @@
       </button>
     </div>
 
+    <!-- Grid Tempat Menampilkan Artikel Web -->
     <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Loading Awal -->
       <div id="loading-state" class="col-span-full text-center py-20 bg-surface-800/40 border border-slate-800/80 rounded-2xl">
         <div class="inline-block animate-spin rounded-full h-7 w-7 border-2 border-cyan-400 border-r-transparent mb-3"></div>
         <p class="text-xs text-slate-400 tracking-wide">Sinkronisasi database EduPulse...</p>
@@ -83,8 +90,9 @@
     </div>
   </main>
 
+  <!-- ================= POPUP MODAL WRITING (Form Tersembunyi) ================= -->
   <div id="modal-tulis" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-surface-800 border border-slate-700/60 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden scale-95 transition-all duration-300" id="modal-content">
+    <div class="bg-surface-800 border border-slate-700/60 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden scale-95" id="modal-content">
       <div class="px-6 py-4 border-b border-slate-700/50 flex justify-between items-center bg-surface-900/40">
         <h3 class="text-md font-semibold text-white">Mulai Menulis Artikel</h3>
         <button onclick="tutupModalTambah()" class="text-slate-400 hover:text-white text-lg">&times;</button>
@@ -110,15 +118,17 @@
     </div>
   </div>
 
+  <!-- ================= FOOTER ================= -->
   <footer class="border-t border-slate-800/80 bg-surface-800/20 py-6 px-6 text-center text-xs text-slate-500 tracking-wide">
     <p>&copy; 2026 EduPulse Journal. Crafted for Premium Reading Experience.</p>
   </footer>
 
+  <!-- ================= CORE LOGIC SYSTEM ================= -->
   <script>
     const API_URL = 'https://lms.agungbarliansaputra.workers.dev/api/articles';
     const JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.QMUFsIDTnFmyG3nMiGM6SDlOWk5GTlVSR0Yzd2g3U21xSnAtUXYzMA";
 
-    // Fungsi Pengendali Modal Tulis
+    // Fungsi Pengendali Efek Modal Tulis
     function bukaModalTambah() {
       const modal = document.getElementById('modal-tulis');
       modal.classList.remove('hidden');
@@ -129,7 +139,7 @@
       setTimeout(() => document.getElementById('modal-tulis').classList.add('hidden'), 200);
     }
 
-    // 1. Ambil & Render Artikel ala Jurnal Komunitas (GET)
+    // 1. Ambil & Render Artikel (VERSI ANTI-LOADING / FIX)
     async function ambilDataArtikel() {
       const grid = document.getElementById('articles-grid');
       const countBadge = document.getElementById('article-count');
@@ -147,4 +157,139 @@
 
           if (result.data.length === 0) {
             grid.innerHTML = `
-              <div class="col-
+              <div class="col-span-full text-center py-16 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+                📭 Belum ada artikel terbit. Jadilah yang pertama menulis karya!
+              </div>`;
+            return;
+          }
+
+          result.data.forEach((article, index) => {
+            const dateStr = article.created_at ? new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Baru saja';
+            
+            // Menggunakan CSS Gradients Keren sebagai Pengganti Gambar agar Render Instan 100% Anti-Stuck
+            const gradients = [
+              'from-cyan-500 to-blue-600',
+              'from-purple-500 to-indigo-600',
+              'from-emerald-400 to-teal-600',
+              'from-rose-500 to-orange-500',
+              'from-fuchsia-600 to-pink-500'
+            ];
+            const chosenGradient = gradients[index % gradients.length];
+
+            const card = document.createElement('article');
+            card.className = "bg-surface-800 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-slate-700 hover:-translate-y-1 shadow-lg hover:shadow-cyan-500/5 flex flex-col justify-between";
+            card.innerHTML = `
+              <div>
+                <!-- Cover CSS Gradient Ringan & Instan -->
+                <div class="h-40 w-full bg-gradient-to-br ${chosenGradient} relative flex items-center justify-center p-4">
+                  <span class="text-white font-serif text-3xl font-bold opacity-15 select-none tracking-wider uppercase">${article.title.substring(0, 3)}</span>
+                  <span class="absolute top-4 left-4 bg-surface-900/80 backdrop-blur-md border border-slate-700/50 text-[10px] font-bold uppercase tracking-wider text-cyan-400 px-2.5 py-1 rounded-md">
+                    Materi LMS
+                  </span>
+                </div>
+                
+                <!-- Badan Teks Artikel -->
+                <div class="p-5">
+                  <div class="flex items-center gap-2 text-xs text-slate-400 mb-2.5">
+                    <span class="font-medium text-slate-300">${article.author || 'Writer'}</span>
+                    <span>•</span>
+                    <span>${dateStr}</span>
+                  </div>
+                  <h3 class="serif-title text-xl text-white font-medium mb-2.5 line-clamp-2 hover:text-cyan-300 cursor-pointer">
+                    ${article.title}
+                  </h3>
+                  <p class="text-xs text-slate-400 leading-relaxed line-clamp-3 whitespace-pre-line">
+                    ${article.content}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Metadata & Aksi Bawah -->
+              <div class="px-5 pb-5 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
+                <span class="flex items-center gap-1">☕ 3 min read</span>
+                <button onclick="hapusArtikel('${article.id}')" class="text-[11px] font-medium text-rose-400/80 hover:text-rose-400 hover:bg-rose-500/10 px-2.5 py-1 rounded-md border border-rose-500/10 hover:border-rose-500/30">
+                  Hapus
+                </button>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        } else {
+          tampilkanError("Gagal menyelaraskan umpan data API.");
+        }
+      } catch (error) {
+        console.error(error);
+        tampilkanError("Gagal terhubung ke API server. Periksa jaringan Anda.");
+      }
+    }
+
+    // 2. Tambah Artikel Baru (POST)
+    async function simpanArtikelBaru() {
+      const titleInput = document.getElementById('input-title');
+      const contentInput = document.getElementById('input-content');
+
+      if (!titleInput.value.trim() || !contentInput.value.trim()) {
+        alert("⚠️ Judul dan isi artikel wajib diisi!");
+        return;
+      }
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${JWT_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: titleInput.value.trim(),
+            content: contentInput.value.trim()
+          })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          titleInput.value = '';
+          contentInput.value = '';
+          tutupModalTambah();
+          ambilDataArtikel();
+        } else {
+          alert("Gagal menerbitkan: " + result.error);
+        }
+      } catch (error) {
+        alert("Gagal mengirim naskah ke server.");
+      }
+    }
+
+    // 3. Hapus Artikel Langsung Dari Database D1 (DELETE)
+    async function hapusArtikel(id) {
+      if (!confirm("Hapus artikel ini secara permanen dari database?")) return;
+
+      try {
+        const response = await fetch(`${API_URL}/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${JWT_TOKEN}` }
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          ambilDataArtikel();
+        } else {
+          alert("Gagal menghapus: " + result.error);
+        }
+      } catch (error) {
+        alert("Terjadi gangguan sistem saat menghapus.");
+      }
+    }
+
+    function tampilkanError(pesan) {
+      const grid = document.getElementById('articles-grid');
+      grid.innerHTML = `
+        <div class="col-span-full text-center py-10 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-2xl text-xs">
+          ⚠️ ${pesan}
+        </div>`;
+    }
+
+    window.onload = ambilDataArtikel;
+  </script>
+</body>
+</html>
