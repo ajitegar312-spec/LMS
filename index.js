@@ -1,5 +1,5 @@
 // ==========================================
-// 1. UTILITIES & REUSE (Respons Konsisten + CORS)
+// 1. UTILITIES & REUSE 
 // ==========================================
 const jsonResponse = (data, status = 200) => {
   return new Response(JSON.stringify(data), {
